@@ -1,10 +1,10 @@
 """
-Lab 4: Python Matrix Application and Password Hashing Experiment
+Lab 4
 
 This program allows users to:
 1. Perform matrix operations (addition, subtraction, multiplication).
 2. Validate phone numbers and ZIP codes.
-3. Generate password hashes and analyze password security.
+3. Generate password hashes.
 
 Users can select between these features through a main menu.
 """
@@ -83,44 +83,63 @@ class MatrixCalculator:
         """Returns the element-wise multiplication of two matrices."""
         return self.matrix1 * self.matrix2
 
-    def compute_results(self, operation):
-        """Executes the selected matrix operation and formats output properly."""
-        operations = {
-            "a": ("Addition", self.add_matrices),
-            "b": ("Subtraction", self.subtract_matrices),
-            "c": ("Matrix Multiplication", self.multiply_matrices),
-            "d": ("Element-wise Multiplication", self.elementwise_multiplication)
-        }
+    def compute_results(self):
+        """
+        Executes matrix operations, displays results, 
+        and loops back to allow multiple selections.
+        """
+        while True:
+            print("\nSelect a Matrix Operation:")
+            print("a. Addition")
+            print("b. Subtraction")
+            print("c. Matrix Multiplication")
+            print("d. Element-wise Multiplication")
+            print("X. Return to Main Menu")
 
-        if operation not in operations:
-            print("Invalid operation. Try again.")
-            return
+            operation = input("Enter your choice (a/b/c/d/X): ").strip().lower()
 
-        operation_name, operation_function = operations[operation]
-        result = operation_function()
+            if operation == 'x':
+                print("\nReturning to the Main Menu...")
+                return 'x'  # Return a flag indicating the user wants to exit
 
-        # Compute additional statistics
-        transpose = result.T
-        row_means = np.mean(result, axis=1)
-        col_means = np.mean(result, axis=0)
+            operations = {
+                "a": ("Addition", self.add_matrices),
+                "b": ("Subtraction", self.subtract_matrices),
+                "c": ("Matrix Multiplication", self.multiply_matrices),
+                "d": ("Element-wise Multiplication", self.elementwise_multiplication)
+            }
 
-        # Formatting row and column means
-        row_means_str = ", ".join(f"{x:.2f}" for x in row_means)
-        col_means_str = ", ".join(f"{x:.2f}" for x in col_means)
+            if operation not in operations:
+                print("\nInvalid operation. Please enter a valid option (a/b/c/d/X).")
+                continue  # Loops back to ask again
 
-        # Print output with better formatting
-        print(f"\nYou selected {operation_name}. The results are:")
+            # Perform the operation
+            operation_name, operation_function = operations[operation]
+            result = operation_function()
 
-        for row in result:
-            print(" ".join(f"{int(x) if x.is_integer() else round(x, 2)}" for x in row))
+            # Compute additional statistics
+            transpose = result.T
+            row_means = np.mean(result, axis=1)
+            col_means = np.mean(result, axis=0)
 
-        print("\nThe Transpose is:")
-        for row in transpose:
-            print(" ".join(f"{int(x) if x.is_integer() else round(x, 2)}" for x in row))
+            # Formatting row and column means
+            row_means_str = ", ".join(f"{x:.2f}" for x in row_means)
+            col_means_str = ", ".join(f"{x:.2f}" for x in col_means)
 
-        print("\nThe row and column mean values of the results are:")
-        print(f"Row: {row_means_str}")
-        print(f"Column: {col_means_str}")
+            # Print output with better formatting
+            print(f"\nYou selected {operation_name}. The results are:")
+            for row in result:
+                print(" ".join(f"{int(x) if x.is_integer() else round(x, 2)}" for x in row))
+
+            print("\nThe Transpose is:")
+            for row in transpose:
+                print(" ".join(f"{int(x) if x.is_integer() else round(x, 2)}" for x in row))
+
+            print("\nThe row and column mean values of the results are:")
+            print(f"Row: {row_means_str}")
+            print(f"Column: {col_means_str}")
+
+            input("\nPress Enter to return to the Matrix Operations menu...")
 
 class PasswordHasher:
     """Handles password hashing using MD5, SHA-256, and SHA-512."""
@@ -232,17 +251,17 @@ class LabApplication:
         while True:
             play = input("\nDo you want to play the Matrix Game? (Y/N): ").strip().lower()
 
-            # Validate input to allow only 'y', 'n'
             if play not in ['y', 'n']:
                 print("Invalid choice! Please enter 'Y' for Yes or 'N' for No.")
-                continue  # Ask again
+                continue
 
             if play == 'n':
-                break  # Exit the Matrix Game loop
+                break
 
+            # Phone number input (with option to return to Main Menu)
             while True:
-                phone = input("Enter your phone number (XXX-XXX-XXXX)"
-                              " or 'X' to return to the Main Menu: ").strip()
+                phone = input("Enter your phone number (XXX-XXX-XXXX) or 'X'"
+                              " to return to the Main Menu: ").strip()
                 if phone.lower() == 'x':
                     print("\nReturning to the Main Menu...")
                     return  # Exit back to main menu
@@ -250,9 +269,10 @@ class LabApplication:
                     break
                 print("Invalid phone number format. Please try again.")
 
+            # ZIP code input (with option to return to Main Menu)
             while True:
-                zipcode = input("Enter your zip code+4 (XXXXX-XXXX or XXXXX)"
-                                " or 'X' to return to the Main Menu: ").strip()
+                zipcode = input("Enter your zip code+4 (XXXXX-XXXX or XXXXX) or 'X'"
+                                " to return to the Main Menu: ").strip()
                 if zipcode.lower() == 'x':
                     print("\nReturning to the Main Menu...")
                     return  # Exit back to main menu
@@ -264,17 +284,10 @@ class LabApplication:
             matrix1 = validator.get_valid_matrix()
             matrix2 = validator.get_valid_matrix()
 
-            print("\nSelect a Matrix Operation:")
-            print("a. Addition\nb. Subtraction\nc. Matrix Multiplication\n"
-                "d. Element by Element Multiplication\nX. Return to Main Menu")
-            operation = input("Enter your choice (a/b/c/d/X): ").strip().lower()
-
-            if operation == 'x':
-                print("\nReturning to the Main Menu...")
-                return  # Exit back to main menu
-
             calculator = MatrixCalculator(matrix1, matrix2)
-            calculator.compute_results(operation)
+            # Check if compute_results() returns 'x' indicating exit
+            if calculator.compute_results() == 'x':
+                return
 
         print("\n***** Exiting Matrix Game *****")
 
